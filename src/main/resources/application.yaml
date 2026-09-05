@@ -1,0 +1,3 @@
+spring:
+  application:
+    name: PP-Farms-Backend
