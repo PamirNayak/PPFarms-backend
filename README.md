@@ -54,10 +54,11 @@ graph TD
 
 ---
 
-### 2. Database Entity-Relationship Diagram (ERD)
+### 2. Complete Database Entity-Relationship Diagram (100% Schema ERD)
 ```mermaid
 erDiagram
     ORGANIZATIONS ||--o{ USERS : employs
+    ORGANIZATIONS ||--o{ ROLES : defines
     ORGANIZATIONS ||--o{ SUBSCRIPTIONS : holds
     PLANS ||--o{ SUBSCRIPTIONS : defines
     SUBSCRIPTIONS ||--o{ PAYMENTS : bills
@@ -66,39 +67,107 @@ erDiagram
     SPECIES ||--o{ BREEDS : categorizes
     BREEDS ||--o{ ANIMALS : classifies
     SHEDS_PENS ||--o{ ANIMALS : houses
+    ANIMALS ||--o{ ANIMALS : "sire/dam lineage"
     
+    ANIMALS ||--o{ WEIGHT_RECORDS : tracks
     ANIMALS ||--o{ PRODUCTION_RECORDS : yields
     ANIMALS ||--o{ HEALTH_RECORDS : receives
     ANIMALS ||--o{ VACCINATION_RECORDS : inoculated
+    ANIMALS ||--o{ DEWORMING_RECORDS : treated
+    ANIMALS ||--o{ MORTALITY_RECORDS : records
+    ANIMALS ||--o{ HEAT_CYCLES : observes
     ANIMALS ||--o{ BREEDING_RECORDS : bred
     BREEDING_RECORDS ||--o{ PREGNANCIES : conceives
     PREGNANCIES ||--o{ BIRTH_RECORDS : delivers
     BIRTH_RECORDS ||--o{ BIRTH_OFFSPRING : produces
+    ANIMALS ||--o{ BIRTH_OFFSPRING : registers
+    
+    ORGANIZATIONS ||--o{ FLOCK_BATCHES : manages
+    FLOCK_BATCHES ||--o{ FLOCK_MORTALITY_LOGS : logs
+    FLOCK_BATCHES ||--o{ EGG_PRODUCTION_LOGS : collects
     
     ORGANIZATIONS ||--o{ FEED_INVENTORY : stocks
-    ORGANIZATIONS ||--o{ FLOCK_BATCHES : manages
-    FLOCK_BATCHES ||--o{ EGG_PRODUCTION_LOGS : collects
+    FEED_INVENTORY ||--o{ FEED_CONSUMPTION_LOGS : consumes
+    SHEDS_PENS ||--o{ FEED_CONSUMPTION_LOGS : fed_at
+    
+    ORGANIZATIONS ||--o{ CROP_PLOTS : cultivates
+    CROP_PLOTS ||--o{ CROP_HARVEST_LOGS : harvests
+    
+    ORGANIZATIONS ||--o{ CUSTOMERS : engages
+    ORGANIZATIONS ||--o{ SUPPLIERS : procures_from
+    ORGANIZATIONS ||--o{ SALES : executes
+    SALES ||--o{ SALE_ITEMS : contains
+    CUSTOMERS ||--o{ SALES : buys
+    
+    ORGANIZATIONS ||--o{ PURCHASES : orders
+    PURCHASES ||--o{ PURCHASE_ITEMS : contains
+    SUPPLIERS ||--o{ PURCHASES : supplies
+    
     ORGANIZATIONS ||--o{ INCOMES : earns
     ORGANIZATIONS ||--o{ EXPENSES : incurs
-    ORGANIZATIONS ||--o{ SALES : executes
     ORGANIZATIONS ||--o{ TASKS : assigns
     USERS ||--o{ TASKS : executes
+    ORGANIZATIONS ||--o{ AUDIT_LOGS : audits
+    ORGANIZATIONS ||--o{ DOCUMENT_ATTACHMENTS : stores
 ```
 
 ---
 
-### 3. Livestock Reproduction & Production Lifecycle Flowchart
+### 3. Comprehensive Domain Flowcharts
+
+#### A. Multi-Tenant Request Isolation & Security Pipeline (With Redis Rate Limiting)
+```mermaid
+flowchart TD
+    Req[Incoming HTTP Request] --> RateLimiter{Redis @RateLimit Check}
+    RateLimiter -- Limit Exceeded --> HTTP429[HTTP 429 Too Many Requests]
+    RateLimiter -- Allowed --> JWTFilter[JwtAuthenticationFilter]
+    JWTFilter --> AuthCheck{Valid JWT Bearer / Cookie?}
+    AuthCheck -- No --> Deny[HTTP 401 Unauthorized]
+    AuthCheck -- Yes --> Extract[Extract Tenant Org ID & User Role]
+    Extract --> TenantCtx[Set TenantContext ThreadLocal]
+    TenantCtx --> SecCtx[Set SecurityContextHolder]
+    SecCtx --> Dispatcher[Spring MVC Controller Dispatcher]
+    Dispatcher --> RBACCheck{@PreAuthorize Role Allowed?}
+    RBACCheck -- No --> Forbidden[HTTP 403 Access Denied]
+    RBACCheck -- Yes --> Svc[Domain Service Scoped to Org ID]
+    Svc --> Repos[(PostgreSQL Queries with WHERE organization_id = ?)]
+    Repos --> Cleanup[Clear TenantContext on Request Completion]
+```
+
+#### B. Livestock Breeding, Gestation & Dairy Production Lifecycle
 ```mermaid
 flowchart LR
     A[Estrus / Heat Detection] --> B[Mating / AI Insemination]
-    B --> C{Pregnancy Check}
-    C -- Confirmed --> D[Gestation Tracking]
+    B --> C{Pregnancy Diagnosis}
     C -- Not Pregnant --> A
+    C -- Confirmed --> D[Automated Gestation Tracker]
     D --> E[Kidding / Calving Delivery]
-    E --> F[Offspring Tagging & Birth Weight]
-    E --> G[Lactation & Milk Yield Logging]
-    G --> H[Daily Quality Test: Fat% & SNF%]
-    H --> I[Bulk Milk Sales & Invoicing]
+    E --> F[Offspring Ear Tagging & Birth Weight]
+    E --> G[Lactation Period Initiated]
+    G --> H[Daily Morning & Evening Milking Sessions]
+    H --> I[Quality Analysis: Fat% & SNF%]
+    I --> J[Bulk Milk Sales Invoice & Income Ledger]
+```
+
+#### C. End-to-End Farm ERP & Cash Flow Pipeline
+```mermaid
+flowchart TD
+    subgraph Procurement & Inventory
+        PO[Supplier Purchase Order] --> BuyItems[Feed / Medicine Procured]
+        BuyItems --> ExpenseLedger[Auto-Recorded to Expenses Ledger]
+        BuyItems --> Stock[Feed Inventory Stocked]
+        Stock --> DailyFeed[Daily Feed Consumption Log]
+    end
+    
+    subgraph Production & Revenue
+        DailyFeed --> MilkProd[Milk Production & Egg Collection]
+        MilkProd --> SaleOrder[Customer Sales Order]
+        SaleOrder --> Invoice[Invoice Generated]
+        Invoice --> IncomeLedger[Auto-Recorded to Incomes Ledger]
+    end
+    
+    ExpenseLedger --> FinSummary[Real-Time Cash Flow & P&L Summary Dashboard]
+    IncomeLedger --> FinSummary
 ```
 
 - **Runtime:** Java 21 LTS with Virtual Threads (`spring.threads.virtual.enabled=true`) for non-blocking I/O.
@@ -383,9 +452,9 @@ ENTRYPOINT ["java", "-XX:+UseZGC", "-XX:+ZGenerational", "-jar", "app.jar"]
 
 ## 👥 Author & Contributions
 
-- **Developer:** Pamir ([GitHub](https://github.com/))
+- **Developer:** Pamir Nayak ([GitHub Profile](https://github.com/PamirNayak))
 - **Project:** PP-Farms Multi-Tenant Farm SaaS System
-- **Contact:** `pamir@ppfarms.com`
+- **Contact:** `pamirnayak6@gmail.com`
 
 ---
 *Built with passion for modern agricultural technology and sustainable farming.* 🚜🌱
