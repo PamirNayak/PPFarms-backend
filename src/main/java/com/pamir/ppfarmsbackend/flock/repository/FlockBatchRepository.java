@@ -13,4 +13,5 @@ public interface FlockBatchRepository extends JpaRepository<FlockBatch, UUID> {
     List<FlockBatch> findByOrganizationIdAndDeletedAtIsNullOrderByArrivalDateDesc(UUID organizationId);
     Optional<FlockBatch> findByIdAndOrganizationIdAndDeletedAtIsNull(UUID id, UUID organizationId);
     List<FlockBatch> findByOrganizationIdAndStatusAndDeletedAtIsNull(UUID organizationId, String status);
+    boolean existsByShedPenIdAndDeletedAtIsNull(UUID shedPenId);
 }

@@ -96,7 +96,13 @@ public class CustomerServiceImpl implements CustomerService {
             throw new BadRequestException("Unauthorized access");
         }
 
-        customerRepository.delete(customer);
+        if (customer.getOutstandingBalance() != null && customer.getOutstandingBalance().compareTo(BigDecimal.ZERO) > 0) {
+            throw new BadRequestException("Cannot delete customer '" + customer.getName() + "' because they have an outstanding balance of " + customer.getOutstandingBalance());
+        }
+
+        customer.setDeletedAt(java.time.OffsetDateTime.now());
+        customer.setIsActive(false);
+        customerRepository.save(customer);
     }
 
     private CustomerResponse mapToResponse(Customer customer) {

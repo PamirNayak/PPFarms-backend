@@ -99,7 +99,13 @@ public class SupplierServiceImpl implements SupplierService {
             throw new BadRequestException("Unauthorized access");
         }
 
-        supplierRepository.delete(supplier);
+        if (supplier.getCurrentBalance() != null && supplier.getCurrentBalance().compareTo(BigDecimal.ZERO) > 0) {
+            throw new BadRequestException("Cannot delete supplier '" + supplier.getName() + "' because there is a payable balance of " + supplier.getCurrentBalance());
+        }
+
+        supplier.setDeletedAt(java.time.OffsetDateTime.now());
+        supplier.setIsActive(false);
+        supplierRepository.save(supplier);
     }
 
     private SupplierResponse mapToResponse(Supplier supplier) {

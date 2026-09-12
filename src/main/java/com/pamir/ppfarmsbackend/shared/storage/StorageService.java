@@ -20,4 +20,20 @@ public interface StorageService {
      * @param fileUrl the stored file URL
      */
     void deleteFileByUrl(String fileUrl);
+
+    /**
+     * Streams/downloads file bytes from Supabase Storage using master service credentials.
+     *
+     * @param fileUrl the stored file URL or object path
+     * @return raw binary file bytes
+     */
+    byte[] downloadFileByUrl(String fileUrl);
+
+    /**
+     * Determines MIME content type from the file URL or extension.
+     *
+     * @param fileUrl the stored file URL
+     * @return MIME content type string
+     */
+    String getContentType(String fileUrl);
 }

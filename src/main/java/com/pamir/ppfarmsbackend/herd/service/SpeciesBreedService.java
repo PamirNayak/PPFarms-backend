@@ -11,7 +11,7 @@ import java.util.UUID;
 
 public interface SpeciesBreedService {
     Species createSpecies(SpeciesRequest request, CustomUserDetails userDetails);
-    List<Species> getAllSpecies();
+    List<Species> getAllSpecies(CustomUserDetails userDetails);
     Species updateSpecies(UUID id, SpeciesRequest request);
     void deleteSpecies(UUID id);
 

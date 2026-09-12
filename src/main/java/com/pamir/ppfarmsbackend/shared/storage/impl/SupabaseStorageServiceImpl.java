@@ -191,4 +191,94 @@ public class SupabaseStorageServiceImpl implements StorageService {
             default -> "jpg";
         };
     }
+
+    @Override
+    public byte[] downloadFileByUrl(String fileUrl) {
+        if (fileUrl == null || fileUrl.isBlank()) {
+            throw new BadRequestException("File URL is required");
+        }
+
+        try {
+            String bucket = null;
+            String objectPath = null;
+
+            String publicPrefix = "/storage/v1/object/public/";
+            String authPrefix = "/storage/v1/object/authenticated/";
+            String objPrefix = "/storage/v1/object/";
+
+            String cleanUrl = fileUrl;
+            if (cleanUrl.contains("?")) {
+                cleanUrl = cleanUrl.substring(0, cleanUrl.indexOf("?"));
+            }
+
+            if (cleanUrl.contains(publicPrefix)) {
+                String remainder = cleanUrl.substring(cleanUrl.indexOf(publicPrefix) + publicPrefix.length());
+                int slash = remainder.indexOf('/');
+                if (slash != -1) {
+                    bucket = remainder.substring(0, slash);
+                    objectPath = remainder.substring(slash + 1);
+                }
+            } else if (cleanUrl.contains(authPrefix)) {
+                String remainder = cleanUrl.substring(cleanUrl.indexOf(authPrefix) + authPrefix.length());
+                int slash = remainder.indexOf('/');
+                if (slash != -1) {
+                    bucket = remainder.substring(0, slash);
+                    objectPath = remainder.substring(slash + 1);
+                }
+            } else if (cleanUrl.contains(objPrefix)) {
+                String remainder = cleanUrl.substring(cleanUrl.indexOf(objPrefix) + objPrefix.length());
+                int slash = remainder.indexOf('/');
+                if (slash != -1) {
+                    bucket = remainder.substring(0, slash);
+                    objectPath = remainder.substring(slash + 1);
+                }
+            }
+
+            if (bucket == null || objectPath == null) {
+                if (cleanUrl.startsWith("http://") || cleanUrl.startsWith("https://")) {
+                    return restClient.get()
+                            .uri(fileUrl)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseKey)
+                            .header("apikey", supabaseKey)
+                            .retrieve()
+                            .body(byte[].class);
+                }
+                throw new BadRequestException("Invalid storage file path format: " + fileUrl);
+            }
+
+            String downloadEndpoint = String.format("%s/storage/v1/object/authenticated/%s/%s", supabaseUrl, bucket, objectPath);
+
+            try {
+                return restClient.get()
+                        .uri(downloadEndpoint)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseKey)
+                        .header("apikey", supabaseKey)
+                        .retrieve()
+                        .body(byte[].class);
+            } catch (Exception ex) {
+                String fallbackEndpoint = String.format("%s/storage/v1/object/%s/%s", supabaseUrl, bucket, objectPath);
+                return restClient.get()
+                        .uri(fallbackEndpoint)
+                        .header(HttpHeaders.AUTHORIZATION, "Bearer " + supabaseKey)
+                        .header("apikey", supabaseKey)
+                        .retrieve()
+                        .body(byte[].class);
+            }
+        } catch (Exception e) {
+            log.error("[STORAGE DOWNLOAD ERROR] Failed retrieving file bytes for URL: {}", fileUrl, e);
+            throw new com.pamir.ppfarmsbackend.shared.exception.ResourceNotFoundException("Could not retrieve file from cloud storage: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public String getContentType(String fileUrl) {
+        if (fileUrl == null) return "application/octet-stream";
+        String lower = fileUrl.toLowerCase();
+        if (lower.endsWith(".png")) return "image/png";
+        if (lower.endsWith(".webp")) return "image/webp";
+        if (lower.endsWith(".gif")) return "image/gif";
+        if (lower.endsWith(".pdf")) return "application/pdf";
+        if (lower.endsWith(".svg")) return "image/svg+xml";
+        return "image/jpeg";
+    }
 }

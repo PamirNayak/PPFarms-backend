@@ -47,6 +47,54 @@ public class ReferenceMetadataServiceImpl implements ReferenceMetadataService {
                 .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
                 .toList());
 
+        metadata.put("PAYMENT_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.billing.domain.PaymentStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("PAYMENT_METHOD", Arrays.stream(com.pamir.ppfarmsbackend.billing.domain.PaymentMethod.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("SUBSCRIPTION_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.billing.domain.SubscriptionStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("PLAN_TYPE", Arrays.stream(com.pamir.ppfarmsbackend.billing.domain.PlanType.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("TASK_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.tasks.domain.TaskStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("TASK_PRIORITY", Arrays.stream(com.pamir.ppfarmsbackend.tasks.domain.TaskPriority.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("SALE_PAYMENT_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.sales.domain.SalePaymentStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("PREGNANCY_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.reproduction.domain.PregnancyStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("VACCINATION_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.health.domain.VaccinationStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("FLOCK_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.flock.domain.FlockStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("ACCOUNT_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.identity.domain.AccountStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
+        metadata.put("INQUIRY_STATUS", Arrays.stream(com.pamir.ppfarmsbackend.identity.domain.InquiryStatus.values())
+                .map(e -> Map.of("value", e.name(), "label", e.getDisplayName()))
+                .toList());
+
         // 2. Export Available SaaS System Modules Catalog
         metadata.put("SYSTEM_MODULES", com.pamir.ppfarmsbackend.billing.domain.PlanFeature.toCatalogList());
 

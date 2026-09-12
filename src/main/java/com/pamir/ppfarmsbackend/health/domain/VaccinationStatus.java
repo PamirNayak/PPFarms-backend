@@ -1,14 +1,14 @@
-package com.pamir.ppfarmsbackend.tasks.domain;
+package com.pamir.ppfarmsbackend.health.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum TaskStatus {
-    PENDING("Pending"),
-    IN_PROGRESS("In Progress"),
+public enum VaccinationStatus {
+    SCHEDULED("Scheduled"),
     COMPLETED("Completed"),
+    MISSED("Missed"),
     CANCELLED("Cancelled");
 
     private final String displayName;

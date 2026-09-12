@@ -80,6 +80,29 @@ public class AuthServiceImpl implements AuthService {
                 .build();
         organization = organizationRepository.save(organization);
 
+        // Auto-provision 14-day Free Trial for new farm organization
+        try {
+            Plan freePlan = planRepository.findAll().stream()
+                    .filter(p -> "FREE".equalsIgnoreCase(p.getPlanType()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (freePlan != null) {
+                Subscription trialSubscription = Subscription.builder()
+                        .organizationId(organization.getId())
+                        .plan(freePlan)
+                        .status("TRIAL")
+                        .startDate(LocalDate.now())
+                        .endDate(LocalDate.now().plusDays(14))
+                        .autoRenew(false)
+                        .trialUsed(true)
+                        .build();
+                subscriptionRepository.save(trialSubscription);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to auto-provision trial subscription on registration: {}", e.getMessage());
+        }
+
         Role adminRole = roleRepository.findByName("ADMIN")
                 .orElseThrow(() -> new ResourceNotFoundException("ADMIN role not configured in database"));
 

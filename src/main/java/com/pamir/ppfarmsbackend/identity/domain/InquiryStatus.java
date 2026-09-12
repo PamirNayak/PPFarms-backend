@@ -1,15 +1,15 @@
-package com.pamir.ppfarmsbackend.tasks.domain;
+package com.pamir.ppfarmsbackend.identity.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum TaskStatus {
-    PENDING("Pending"),
+public enum InquiryStatus {
+    NEW("New Inquiry"),
     IN_PROGRESS("In Progress"),
-    COMPLETED("Completed"),
-    CANCELLED("Cancelled");
+    CONTACTED("Contacted"),
+    CLOSED("Closed");
 
     private final String displayName;
 }

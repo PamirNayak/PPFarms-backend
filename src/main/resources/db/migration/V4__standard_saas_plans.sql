@@ -8,7 +8,7 @@ INSERT INTO system_reference_categories (id, category_type, code, display_label,
 VALUES
     (gen_random_uuid(), 'ANIMAL_TYPE', 'GOAT', 'Goat (Capra hircus)', 1, true),
     (gen_random_uuid(), 'ANIMAL_TYPE', 'SHEEP', 'Sheep (Ovis aries)', 2, true),
-    (gen_random_uuid(), 'ANIMAL_TYPE', 'COW', 'Dairy Cattle / Cow', 3, true),
+    (gen_random_uuid(), 'ANIMAL_TYPE', 'CATTLE', 'Cattle', 3, true),
     (gen_random_uuid(), 'ANIMAL_TYPE', 'BUFFALO', 'Dairy Buffalo', 4, true),
     (gen_random_uuid(), 'ANIMAL_TYPE', 'POULTRY', 'Poultry & Birds', 5, true)
 ON CONFLICT DO NOTHING;
@@ -23,7 +23,7 @@ VALUES (
     0.00,
     50,
     2,
-    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":false,"reports":false,"allowedSpecies":["GOAT","SHEEP","COW","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
+    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":false,"reports":false,"allowedSpecies":["GOAT","SHEEP","CATTLE","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
     true
 )
 ON CONFLICT (name) DO UPDATE SET
@@ -43,7 +43,7 @@ VALUES (
     999.00,
     200,
     5,
-    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":true,"reports":true,"allowedSpecies":["GOAT","SHEEP","COW","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
+    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":true,"reports":true,"allowedSpecies":["GOAT","SHEEP","CATTLE","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
     true
 )
 ON CONFLICT (name) DO UPDATE SET
@@ -63,7 +63,7 @@ VALUES (
     9999.00,
     999999,
     20,
-    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":true,"reports":true,"allowedSpecies":["GOAT","SHEEP","COW","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
+    '{"milkLogging":true,"pedigree":true,"vetModule":true,"accounting":true,"reports":true,"allowedSpecies":["GOAT","SHEEP","CATTLE","BUFFALO","POULTRY"],"multiSpecies":true,"maxSpeciesCount":5}'::jsonb,
     true
 )
 ON CONFLICT (name) DO UPDATE SET

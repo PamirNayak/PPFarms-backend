@@ -44,7 +44,7 @@ public class SpeciesBreedController {
     @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'ADMIN', 'MANAGER', 'VET', 'WORKER')")
     @Operation(summary = "Get All Species", description = "Retrieves list of available livestock species")
     public ResponseEntity<ApiResponse<List<Species>>> getSpecies(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        List<Species> speciesList = speciesBreedService.getAllSpecies();
+        List<Species> speciesList = speciesBreedService.getAllSpecies(userDetails);
         return ResponseEntity.ok(ApiResponse.success(speciesList));
     }
 

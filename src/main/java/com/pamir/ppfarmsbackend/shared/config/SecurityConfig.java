@@ -66,12 +66,14 @@ public class SecurityConfig {
                 })
             )
             .authorizeHttpRequests(auth -> auth
+                .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ASYNC).permitAll()
                 .requestMatchers(
                     "/api/v1/auth/**",
                     "/api/v1/plans/**",
                     "/api/v1/payment-methods/**",
                     "/api/v1/public/**",
                     "/api/v1/reference/**",
+                    "/api/v1/storage/view**",
                     "/swagger-ui/**",
                     "/swagger-ui.html",
                     "/v3/api-docs/**",

@@ -1,5 +1,8 @@
 package com.pamir.ppfarmsbackend.herd.service.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pamir.ppfarmsbackend.billing.repository.SubscriptionRepository;
 import com.pamir.ppfarmsbackend.herd.dto.BreedRequest;
 import com.pamir.ppfarmsbackend.herd.dto.SpeciesRequest;
 import com.pamir.ppfarmsbackend.herd.entity.Breed;
@@ -16,8 +19,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +33,8 @@ public class SpeciesBreedServiceImpl implements SpeciesBreedService {
     private final SpeciesRepository speciesRepository;
     private final BreedRepository breedRepository;
     private final AnimalRepository animalRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -42,8 +50,38 @@ public class SpeciesBreedServiceImpl implements SpeciesBreedService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<Species> getAllSpecies() {
-        return speciesRepository.findAll();
+    public List<Species> getAllSpecies(CustomUserDetails userDetails) {
+        List<Species> allSpecies = speciesRepository.findAll();
+        if (userDetails == null || "SUPER_ADMIN".equalsIgnoreCase(userDetails.getRole()) || "ROLE_SUPER_ADMIN".equalsIgnoreCase(userDetails.getRole()) || userDetails.getTenantId() == null) {
+            return allSpecies;
+        }
+
+        return subscriptionRepository.findByOrganizationId(userDetails.getTenantId())
+                .map(sub -> {
+                    if (sub.getPlan() == null || sub.getPlan().getFeatures() == null) {
+                        return allSpecies;
+                    }
+                    try {
+                        JsonNode root = objectMapper.readTree(sub.getPlan().getFeatures());
+                        JsonNode allowedNode = root.path("allowedSpecies");
+                        if (allowedNode.isArray() && !allowedNode.isEmpty()) {
+                            Set<String> allowedSet = new HashSet<>();
+                            for (JsonNode item : allowedNode) {
+                                allowedSet.add(item.asText().toUpperCase().trim());
+                            }
+                            if (allowedSet.contains("ALL")) {
+                                return allSpecies;
+                            }
+                            return allSpecies.stream()
+                                    .filter(s -> allowedSet.contains(s.getName().toUpperCase().trim()))
+                                    .collect(Collectors.toList());
+                        }
+                    } catch (Exception e) {
+                        log.warn("Failed to parse plan features JSON for organization {}: {}", userDetails.getTenantId(), e.getMessage());
+                    }
+                    return allSpecies;
+                })
+                .orElse(allSpecies);
     }
 
     @Override

@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Approved & Plan Activated</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: #070b12;
+            color: #f8fafc;
+            margin: 0;
+            padding: 30px 15px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .wrapper {
+            max-width: 580px;
+            margin: 0 auto;
+            background: #0d1423;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            overflow: hidden;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+        }
+        .accent-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #10b981, #059669, #06b6d4);
+        }
+        .header {
+            padding: 32px 32px 20px 32px;
+            text-align: center;
+        }
+        .logo-badge {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px auto;
+            background: linear-gradient(135deg, #10b981, #06b6d4);
+            border-radius: 14px;
+            line-height: 48px;
+            font-size: 24px;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(16, 185, 129, 0.35);
+        }
+        .title {
+            margin: 0;
+            font-size: 22px;
+            font-weight: 900;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        .subtitle {
+            margin: 6px 0 0 0;
+            font-size: 13px;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .content {
+            padding: 0 32px 32px 32px;
+            color: #cbd5e1;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .success-banner {
+            background: rgba(16, 185, 129, 0.12);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 16px;
+            text-align: center;
+            color: #34d399;
+            font-weight: 700;
+            margin: 16px 0;
+        }
+        .details-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 18px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .data-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+        .data-row:last-child {
+            border-bottom: none;
+        }
+        .data-label {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+        .data-value {
+            color: #ffffff;
+            font-weight: 700;
+            text-align: right;
+        }
+        .btn-container {
+            text-align: center;
+            margin: 28px 0 16px 0;
+        }
+        .action-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: #ffffff !important;
+            text-decoration: none;
+            padding: 12px 28px;
+            border-radius: 12px;
+            font-weight: 800;
+            font-size: 14px;
+            box-shadow: 0 8px 20px rgba(16, 185, 129, 0.35);
+        }
+        .footer {
+            padding: 20px 32px;
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 11px;
+            text-align: center;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="accent-bar"></div>
+    <div class="header">
+        <div class="logo-badge">🎉</div>
+        <h1 class="title">Payment Verified &amp; Activated!</h1>
+        <p class="subtitle">PP-Farms Commercial Cloud Services</p>
+    </div>
+    <div class="content">
+        <p>Dear <strong th:text="">Farm Administrator</strong>,</p>
+
+        <div class="success-banner">
+            ✅ Your payment has been verified and your subscription tier is now active!
+        </div>
+
+        <p>Your subscription plan for <strong th:text="">Your Farm</strong> has been upgraded with all premium capabilities unlocked.</p>
+
+        <div class="details-card">
+            <div class="data-row">
+                <span class="data-label">Active Plan:</span>
+                <span class="data-value" th:text="">Commercial Starter</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Billing Cycle:</span>
+                <span class="data-value" th:text="">MONTHLY</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Amount Paid:</span>
+                <span class="data-value" style="color: #34d399;" th:text="'₹' + ">₹999</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Invoice Number:</span>
+                <span class="data-value" style="font-family: monospace; color: #a78bfa;" th:text="">INV-2026-ABC123</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">Subscription Valid Until:</span>
+                <span class="data-value" style="color: #38bdf8;" th:text="">30 Oct 2026</span>
+            </div>
+            <div class="data-row">
+                <span class="data-label">UTR Reference:</span>
+                <span class="data-value" style="font-family: monospace;" th:text="">1234567890</span>
+            </div>
+        </div>
+
+        <div class="btn-container">
+            <a th:href="" class="action-btn">Go to Farm Dashboard</a>
+        </div>
+    </div>
+    <div class="footer">
+        <div>&copy; 2026 PP-Farms Platform. All Rights Reserved.</div>
+    </div>
+</div>
+</body>
+</html>

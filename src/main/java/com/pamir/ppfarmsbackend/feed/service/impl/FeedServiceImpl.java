@@ -9,6 +9,7 @@ import com.pamir.ppfarmsbackend.feed.service.FeedService;
 import com.pamir.ppfarmsbackend.herd.entity.ShedPen;
 import com.pamir.ppfarmsbackend.herd.repository.ShedPenRepository;
 import com.pamir.ppfarmsbackend.shared.exception.BadRequestException;
+import com.pamir.ppfarmsbackend.shared.exception.InsufficientStockException;
 import com.pamir.ppfarmsbackend.shared.exception.ResourceNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -69,7 +70,7 @@ public class FeedServiceImpl implements FeedService {
                 .orElseThrow(() -> new ResourceNotFoundException("Feed inventory item not found"));
 
         if (feed.getQuantityKg().compareTo(request.getQuantityConsumedKg()) < 0) {
-            throw new BadRequestException("Insufficient feed stock available. Current stock: " + feed.getQuantityKg() + " Kg");
+            throw new InsufficientStockException("Insufficient feed stock available for '" + feed.getFeedName() + "'. Current stock: " + feed.getQuantityKg() + " Kg (Requested: " + request.getQuantityConsumedKg() + " Kg)");
         }
 
         // Deduct stock
@@ -82,6 +83,9 @@ public class FeedServiceImpl implements FeedService {
         if (request.getShedPenId() != null) {
             shedPen = shedPenRepository.findById(request.getShedPenId())
                     .orElseThrow(() -> new ResourceNotFoundException("Shed/Pen not found"));
+            if (!tenantId.equals(shedPen.getOrganizationId())) {
+                throw new BadRequestException("Selected Shed/Pen does not belong to your farm.");
+            }
         }
 
         FeedConsumptionLog log = FeedConsumptionLog.builder()

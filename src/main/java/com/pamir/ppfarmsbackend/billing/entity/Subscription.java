@@ -41,6 +41,10 @@ public class Subscription {
     @Builder.Default
     private Boolean autoRenew = false;
 
+    @Column(name = "trial_used")
+    @Builder.Default
+    private Boolean trialUsed = true;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     @Builder.Default
     private OffsetDateTime createdAt = OffsetDateTime.now();

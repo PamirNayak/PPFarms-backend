@@ -53,6 +53,20 @@ public class StorageController {
                 )));
     }
 
+    @GetMapping("/view")
+    @Operation(summary = "View / Stream Cloud Storage File", description = "Streams raw binary file bytes from cloud storage with automatic MIME type headers")
+    public ResponseEntity<byte[]> viewFile(
+            @RequestParam("url") String fileUrl
+    ) {
+        byte[] fileBytes = storageService.downloadFileByUrl(fileUrl);
+        String contentType = storageService.getContentType(fileUrl);
+
+        return ResponseEntity.ok()
+                .header(org.springframework.http.HttpHeaders.CONTENT_TYPE, contentType)
+                .header(org.springframework.http.HttpHeaders.CACHE_CONTROL, "public, max-age=86400")
+                .body(fileBytes);
+    }
+
     @DeleteMapping("/delete")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Delete File from Cloud Storage", description = "Deletes a previously uploaded file from Supabase storage")

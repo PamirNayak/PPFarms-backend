@@ -88,18 +88,27 @@ public class AnimalServiceImpl implements AnimalService {
         if (request.getShedPenId() != null) {
             shedPen = shedPenRepository.findById(request.getShedPenId())
                     .orElseThrow(() -> new ResourceNotFoundException("Shed/Pen location not found"));
+            if (!tenantId.equals(shedPen.getOrganizationId())) {
+                throw new BadRequestException("Selected Shed/Pen does not belong to your farm.");
+            }
         }
 
         Animal sire = null;
         if (request.getSireId() != null) {
             sire = animalRepository.findById(request.getSireId())
                     .orElseThrow(() -> new ResourceNotFoundException("Sire (father) animal not found"));
+            if (!tenantId.equals(sire.getOrganizationId())) {
+                throw new BadRequestException("Selected Sire does not belong to your farm.");
+            }
         }
 
         Animal dam = null;
         if (request.getDamId() != null) {
             dam = animalRepository.findById(request.getDamId())
                     .orElseThrow(() -> new ResourceNotFoundException("Dam (mother) animal not found"));
+            if (!tenantId.equals(dam.getOrganizationId())) {
+                throw new BadRequestException("Selected Dam does not belong to your farm.");
+            }
         }
 
         AnimalGender gender = parseGender(request.getGender());
@@ -152,6 +161,15 @@ public class AnimalServiceImpl implements AnimalService {
             throw new BadRequestException("Unauthorized access to animal profile");
         }
 
+        if (request.getTagNumber() != null && !request.getTagNumber().equalsIgnoreCase(animal.getTagNumber())) {
+            animalRepository.findByOrganizationIdAndTagNumberAndDeletedAtIsNull(tenantId, request.getTagNumber())
+                    .ifPresent(existing -> {
+                        if (!existing.getId().equals(id)) {
+                            throw new BadRequestException("Ear Tag number '" + request.getTagNumber() + "' is already in use by another animal in your farm.");
+                        }
+                    });
+        }
+
         Species species = speciesRepository.findById(request.getSpeciesId())
                 .orElseThrow(() -> new ResourceNotFoundException("Species not found"));
         Breed breed = breedRepository.findById(request.getBreedId())
@@ -160,6 +178,9 @@ public class AnimalServiceImpl implements AnimalService {
         if (request.getShedPenId() != null) {
             ShedPen shedPen = shedPenRepository.findById(request.getShedPenId())
                     .orElseThrow(() -> new ResourceNotFoundException("Shed/Pen location not found"));
+            if (!tenantId.equals(shedPen.getOrganizationId())) {
+                throw new BadRequestException("Selected Shed/Pen does not belong to your farm.");
+            }
             animal.setShedPen(shedPen);
         } else {
             animal.setShedPen(null);

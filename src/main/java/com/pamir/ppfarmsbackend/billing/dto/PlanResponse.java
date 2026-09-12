@@ -25,6 +25,7 @@ public class PlanResponse {
 
     public static PlanResponse fromEntity(Plan plan) {
         if (plan == null) return null;
+
         return PlanResponse.builder()
                 .id(plan.getId())
                 .name(plan.getName())

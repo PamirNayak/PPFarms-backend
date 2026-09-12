@@ -26,6 +26,13 @@ public class Payment {
     @Column(name = "subscription_id", nullable = false)
     private UUID subscriptionId;
 
+    @Column(name = "target_plan_id")
+    private UUID targetPlanId;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "target_plan_id", insertable = false, updatable = false)
+    private Plan targetPlan;
+
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal amount;
 

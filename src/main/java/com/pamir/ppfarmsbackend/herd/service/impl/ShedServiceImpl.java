@@ -1,7 +1,9 @@
 package com.pamir.ppfarmsbackend.herd.service.impl;
 
+import com.pamir.ppfarmsbackend.flock.repository.FlockBatchRepository;
 import com.pamir.ppfarmsbackend.herd.dto.ShedRequest;
 import com.pamir.ppfarmsbackend.herd.entity.ShedPen;
+import com.pamir.ppfarmsbackend.herd.repository.AnimalRepository;
 import com.pamir.ppfarmsbackend.herd.repository.ShedPenRepository;
 import com.pamir.ppfarmsbackend.herd.service.ShedService;
 import com.pamir.ppfarmsbackend.shared.exception.BadRequestException;
@@ -12,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,6 +24,8 @@ import java.util.UUID;
 public class ShedServiceImpl implements ShedService {
 
     private final ShedPenRepository shedPenRepository;
+    private final AnimalRepository animalRepository;
+    private final FlockBatchRepository flockBatchRepository;
 
     @Override
     @Transactional
@@ -69,7 +74,16 @@ public class ShedServiceImpl implements ShedService {
             throw new BadRequestException("Access denied: You can only delete sheds belonging to your farm.");
         }
 
-        shedPenRepository.delete(shedPen);
-        log.info("[SHED DELETE] Deleted shed {} (ID: {}) for Tenant: {}", shedPen.getName(), id, userDetails.getTenantId());
+        if (animalRepository.existsByShedPenIdAndDeletedAtIsNull(id)) {
+            throw new BadRequestException("Cannot delete shed/pen '" + shedPen.getName() + "' because active animals are currently housed in it. Please relocate them first.");
+        }
+
+        if (flockBatchRepository.existsByShedPenIdAndDeletedAtIsNull(id)) {
+            throw new BadRequestException("Cannot delete shed/pen '" + shedPen.getName() + "' because active poultry flock batches are currently assigned to it.");
+        }
+
+        shedPen.setDeletedAt(OffsetDateTime.now());
+        shedPenRepository.save(shedPen);
+        log.info("[SHED DELETE] Soft-deleted shed {} (ID: {}) for Tenant: {}", shedPen.getName(), id, userDetails.getTenantId());
     }
 }

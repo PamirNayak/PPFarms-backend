@@ -18,5 +18,6 @@ public interface AnimalRepository extends JpaRepository<Animal, UUID>, JpaSpecif
     long countByDeletedAtIsNull();
     boolean existsBySpeciesIdAndDeletedAtIsNull(UUID speciesId);
     boolean existsByBreedIdAndDeletedAtIsNull(UUID breedId);
+    boolean existsByShedPenIdAndDeletedAtIsNull(UUID shedPenId);
 }
 

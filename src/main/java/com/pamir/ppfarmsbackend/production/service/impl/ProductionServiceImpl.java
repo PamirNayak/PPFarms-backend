@@ -33,6 +33,10 @@ public class ProductionServiceImpl implements ProductionService {
     @Override
     @Transactional
     public ProductionRecordResponse logProduction(ProductionRecordRequest request, UUID tenantId) {
+        if (request.getQuantity() == null || request.getQuantity().compareTo(java.math.BigDecimal.ZERO) <= 0) {
+            throw new BadRequestException("Production quantity must be greater than zero.");
+        }
+
         Animal animal = null;
         if (request.getAnimalId() != null) {
             animal = animalRepository.findById(request.getAnimalId())
@@ -40,12 +44,18 @@ public class ProductionServiceImpl implements ProductionService {
             if (!animal.getOrganizationId().equals(tenantId)) {
                 throw new BadRequestException("Unauthorized access to animal");
             }
+            if ("MILK".equalsIgnoreCase(request.getProductionType()) && animal.getGender() != com.pamir.ppfarmsbackend.herd.domain.AnimalGender.FEMALE) {
+                throw new BadRequestException("Milk production can only be recorded for female animals (Current animal gender: " + animal.getGender() + ")");
+            }
         }
 
         ShedPen shedPen = null;
         if (request.getShedPenId() != null) {
             shedPen = shedPenRepository.findById(request.getShedPenId())
                     .orElseThrow(() -> new ResourceNotFoundException("Shed/Pen location not found"));
+            if (!tenantId.equals(shedPen.getOrganizationId())) {
+                throw new BadRequestException("Selected Shed/Pen does not belong to your farm.");
+            }
         }
 
         ProductionRecord record = ProductionRecord.builder()
